@@ -61,6 +61,36 @@ def box(name, colour, frm, to):
     return {"name": name, "colour": colour, "from": frm, "to": to}
 
 
+def sprite(name, texture, frm, to):
+    """
+    A flat panel wearing a real texture rather than a palette swatch.
+
+    <p>For the things a box cannot be. A golden axe built out of
+    cuboids is a gold slab and a brown stick, and reads as neither at
+    any distance; the actual item is a 16x16 sprite, and Minecraft
+    itself draws a held item as that sprite with a little depth. A
+    pack may reference vanilla textures, so this is the real axe
+    rather than an impression of one.
+
+    <p><b>The thin axis must be x</b>, and the y and z spans must each
+    be 16, or the sprite is stretched. The UVs below are written for
+    the east and west faces specifically.
+
+    <p>Orientation, worked out from the default-UV table rather than
+    guessed, because a mirrored axe is the kind of thing that is only
+    visible in game. A face with no uv gets, for east,
+    [16-z2, 16-y2, 16-z1, 16-y1] - so u runs toward -z, which on this
+    model is forward, and v runs downward. The golden axe sprite has
+    its head at the top right and its haft running to the bottom left,
+    which therefore lands as head up-and-forward, haft down-and-back.
+    That is a raised axe, which is what was wanted, so east takes the
+    sprite unflipped. West's default runs the other way along z, so it
+    takes a reversed u to show the same face from the other side
+    rather than a mirror image.
+    """
+    return {"name": name, "sprite": texture, "from": frm, "to": to}
+
+
 # --- The werewolf ------------------------------------------------------------
 #
 # Bipedal, hunched, long-armed. Proportions are the whole of the
@@ -102,13 +132,6 @@ CLAW = (226, 222, 212)
 # the silhouette onto the stripes. A bone grey reads as white fur and
 # stays part of the animal.
 STREAK = (198, 196, 190)
-# The axe. Gold pulled down from the item's own near-white yellow for
-# the same reason the streaks are bone rather than white: at full value
-# it is the brightest thing in a night arena and the eye goes to it
-# instead of to the animal. This still reads unmistakably as gold.
-GOLD = (236, 201, 90)
-GOLD_DARK = (176, 142, 54)
-HAFT = (104, 78, 48)
 
 WEREWOLF = [
     # Torso: tilted forward by being deeper than it is wide.
@@ -157,36 +180,35 @@ WEREWOLF = [
 
     # The golden axe, in the right fist.
     #
-    # <b>Part of the model rather than an item in the mob's hand, and
-    # that is the whole fix.</b> The boss used to really hold one - a
-    # piglin brute spawns armed - and because the mob is invisible and
-    # equipment is not, the axe hung in the air beside the werewolf
-    # with nothing gripping it. It also quietly added six attack
-    # damage, since a held weapon's damage adds to the attribute.
+    # <b>The real item's texture, not boxes.</b> It was built out of
+    # cuboids first and that was wrong twice over: a gold slab and a
+    # brown stick do not read as an axe at any distance, and both were
+    # placed *inside* the arm box (x 12-15.5), so the haft was buried
+    # in the limb and only the head showed - as, in the words of the
+    # bug report, "a yellow patch on the arm".
     #
-    # Two other ways were available and are worse. Keeping the real
-    # item means fighting the offset between a piglin brute's wrist and
-    # this model's hand, which are different creatures at different
-    # scales, forever. A second display entity carrying the item means
-    # new sync code and a rotation problem: a display's transform
-    # rotates about its own origin, so an axe placed at the hand would
-    # pivot about the hand while the body pivots about its feet, and
-    # the two would come apart on every lunge.
+    # So it is a flat panel wearing minecraft:item/golden_axe, which is
+    # what a held item is anyway: Minecraft draws items in hands as the
+    # sprite with a little depth. A pack may reference vanilla textures,
+    # so this costs nothing and is the actual axe rather than an
+    # impression of one.
     #
-    # As geometry it is simply welded to the animal: one entity, one
-    # transform, locked through the lunge by construction. It costs the
-    # real item's sprite, which was never going to match a model built
-    # out of flat-shaded boxes anyway, and it costs the six damage -
-    # deliberately, so the number in Bosses.java is the whole of this
-    # boss's melee.
+    # Why not a real item in the mob's hand, which is where it started:
+    # an invisible mob still renders what it holds, so it hung in the
+    # air beside the model, and a held weapon's attack damage adds to
+    # the attribute, so it was silently worth six damage. Why not a
+    # second display entity carrying the item: a display's transform
+    # rotates about its own origin, so an axe at the hand would pivot
+    # about the hand while the body pivots about its feet, and the two
+    # would come apart on every lunge. As part of this model it is
+    # welded to the animal - one entity, one transform.
     #
-    # Held head-up with the blade outward, which is a threat display
-    # rather than a carry. Gripped at y=11, which is inside claw_right
-    # (y 10-12), so the fist closes on the haft instead of near it.
-    box("axe_haft", HAFT, [13.0, 6.5, 4.7], [14.6, 22, 6.3]),
-    box("axe_collar", GOLD_DARK, [12.9, 18.8, 4.5], [14.7, 22.4, 6.5]),
-    box("axe_blade", GOLD, [14.7, 18.0, 4.2], [17.4, 23.2, 6.8]),
-    box("axe_edge", GOLD_DARK, [17.4, 18.6, 4.4], [17.9, 22.6, 6.6]),
+    # Placed just clear of the arm (x 15.6, outside its 15.5) so
+    # nothing is buried this time, and sized 16x16 in z and y so the
+    # sprite is not stretched. See sprite() for how the corners were
+    # chosen to put the haft through the fist.
+    sprite("axe", "minecraft:item/golden_axe",
+           [15.6, 5, -6], [16.4, 21, 10]),
 ]
 
 CREATURES = {"werewolf": WEREWOLF}
@@ -213,10 +235,45 @@ def write_png(path, width, height, pixels):
         out.write(chunk(b"IEND", b""))
 
 
+def panel(name, shape, sprites):
+    """One flat sprite panel. See sprite() for the orientation."""
+    frm, to = shape["from"], shape["to"]
+    for axis, label in ((1, "y"), (2, "z")):
+        span = to[axis] - frm[axis]
+        if abs(span - 16) > 1e-6:
+            raise SystemExit(
+                f"{name}: {shape['name']} spans {span} in {label}, not 16, so the "
+                f"sprite would be stretched")
+    key = shape["name"]
+    if (key, shape["sprite"]) not in sprites:
+        sprites.append((key, shape["sprite"]))
+    reference = f"#{key}"
+    full = [0, 0, 16, 16]
+    # u reversed on the west face so both sides show the same hand of
+    # the axe rather than one being its mirror.
+    mirrored = [16, 0, 0, 16]
+    return {
+        "name": shape["name"],
+        "from": frm,
+        "to": to,
+        "faces": {
+            "east": {"uv": full, "texture": reference},
+            "west": {"uv": mirrored, "texture": reference},
+            # The four edges are a fraction of a unit wide and would
+            # show the palette texture's first swatch if left out.
+            # Given a sliver of the sprite they are simply invisible.
+            "north": {"uv": full, "texture": reference},
+            "south": {"uv": full, "texture": reference},
+            "up": {"uv": full, "texture": reference},
+            "down": {"uv": full, "texture": reference},
+        },
+    }
+
+
 def build(name, boxes):
     colours = []
     for shape in boxes:
-        if shape["colour"] not in colours:
+        if "colour" in shape and shape["colour"] not in colours:
             colours.append(shape["colour"])
 
     # One row of swatches. The texture is tiny, so there is no reason to
@@ -227,7 +284,17 @@ def build(name, boxes):
               for _ in range(height)]
 
     elements = []
+    # Extra textures, one key per distinct sprite, in the order met.
+    sprites = []
     for shape in boxes:
+        for value in shape["from"] + shape["to"]:
+            if not LOW <= value <= HIGH:
+                raise SystemExit(
+                    f"{name}: {shape['name']} has {value}, outside the model space "
+                    f"({LOW}..{HIGH}); the client refuses the whole model")
+        if "sprite" in shape:
+            elements.append(panel(name, shape, sprites))
+            continue
         index = colours.index(shape["colour"])
         # UVs are in sixteenths of the texture regardless of its real
         # size, so this converts pixels to that space.
@@ -239,11 +306,6 @@ def build(name, boxes):
         inset = (u1 - u0) * 0.15
         uv = [round(u0 + inset, 4), round(16 * 0.15, 4),
               round(u1 - inset, 4), round(16 * 0.85, 4)]
-        for value in shape["from"] + shape["to"]:
-            if not LOW <= value <= HIGH:
-                raise SystemExit(
-                    f"{name}: {shape['name']} has {value}, outside the model space "
-                    f"({LOW}..{HIGH}); the client refuses the whole model")
         elements.append({
             "name": shape["name"],
             "from": shape["from"],
@@ -254,7 +316,9 @@ def build(name, boxes):
     model = {
         "credit": "Generated by tools/build_models.py - edit that, not this",
         "texture_size": [width, height],
-        "textures": {"skin": f"forever:item/{name}", "particle": f"forever:item/{name}"},
+        "textures": dict(
+            {"skin": f"forever:item/{name}", "particle": f"forever:item/{name}"},
+            **{key: value for key, value in sprites}),
         "elements": elements,
         "display": {
             # The display entity is spawned with the HEAD transform, so
