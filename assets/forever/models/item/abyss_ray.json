@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "forever:item/leviathan_spawn"
+    "layer0": "forever:item/abyss_ray"
   }
 }

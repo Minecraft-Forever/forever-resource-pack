@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "forever:item/gilded_sturgeon"
+    "layer0": "forever:item/silt_star"
   }
 }
