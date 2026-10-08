@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "forever:item/worldscale"
+    "layer0": "forever:item/zaratan"
   }
 }
