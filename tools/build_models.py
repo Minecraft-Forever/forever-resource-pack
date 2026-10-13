@@ -157,6 +157,18 @@ PELT = (103, 114, 118)
 # behind: at full value a marking is the brightest thing in a night
 # arena and pulls the eye off the silhouette.
 PELT_LIT = (126, 137, 142)
+# A shaded steel for the underside of the light fur. Three greys rather
+# than two because the engine's own shading cannot separate two masses
+# that touch: a forearm laid against a chest in one colour is one shape,
+# whatever angle the faces are at.
+PELT_DARK = (78, 87, 92)
+# And a mid coat tone, for the same reason on the dark side. Limbs wear
+# it so they read as limbs against the body rather than merging into it.
+FUR_MID = (43, 43, 52)
+# The inside of an open mouth. The one warm colour on the animal, and it
+# is what makes a snarl read as a snarl rather than as a gap - a dark
+# hole in a dark head is just a hole.
+MAW = (74, 28, 30)
 # Lighter than the coat, not darker. An underbelly in the darker fur
 # reads as a hole in the chest from the front, which is what the first
 # render showed - and the problem is worse the darker the coat gets.
@@ -175,107 +187,186 @@ EYE = (240, 48, 48)
 CLAW = (236, 234, 228)
 
 WEREWOLF = [
-    # <b>Rebuilt as an animal rather than as a stack of boxes.</b> The
-    # first pass was a column of cuboids with a head on it, which is
-    # what every axis-aligned model is: it read as a Minecraft mob,
-    # which was the point, and not as a werewolf, which was also the
-    # point. Elements can rotate, and five angles on one axis turns out
-    # to be enough for the three things that carry an animal - a spine
-    # leaning out over its feet, legs that bend twice, and a muzzle
-    # that points at you.
+    # <b>Built as an animal, then given enough parts to stop being a
+    # blob.</b> Two rebuilds: the first was a column of axis-aligned
+    # cuboids, and rotation fixed the pose; this one is about the
+    # masses, because a correctly posed animal made of six big boxes
+    # is a correctly posed blob.
     #
-    # The leg is the whole trick. A wolf stands on its toes: what looks
-    # like a backwards knee is an ankle, and the foot is the long bone
-    # between it and the ground. Thigh forward, shin back, foot flat -
-    # a Z rather than a post - and a thing standing like that looks
-    # like it is about to move even when it is still.
+    # Three things do the work, and none of them is more polygons for
+    # their own sake:
+    #
+    # <b>A ragged outline.</b> A straight edge is the thing that reads
+    # as a box from across an arena. Tufts on the ruff, elbows,
+    # haunches and tail break every long edge the body has, and the
+    # hackles down the spine break the one edge a hunched animal shows
+    # most.
+    #
+    # <b>Tones that separate touching masses.</b> The engine shades by
+    # face direction, so two parts that meet at the same angle in the
+    # same colour are one shape however many boxes they are. Limbs
+    # wear a mid coat tone and the light fur has a shaded grey, which
+    # is what makes an arm read as an arm against a chest.
+    #
+    # <b>A face.</b> Brows over the eyes, a jaw that hangs open, teeth
+    # in both of them and a dark red mouth behind. It is most of the
+    # difference between a wolf's head and a grey box with eyes.
 
-    # Legs, digitigrade, built from the hip down.
-    box("thigh_left", FUR, [3.5, 11, 3], [7.5, 20, 8], ("x", 22.5, [5.5, 20, 5.5])),
-    box("thigh_right", FUR, [8.5, 11, 3], [12.5, 20, 8], ("x", 22.5, [10.5, 20, 5.5])),
-    box("shin_left", FUR, [4, 4, 0], [7, 12, 4], ("x", -22.5, [5.5, 12, 2])),
-    box("shin_right", FUR, [9, 4, 0], [12, 12, 4], ("x", -22.5, [10.5, 12, 2])),
-    # Long feet, toes forward: the part a digitigrade animal stands on.
-    box("foot_left", FUR_DARK, [3.5, 0, -4], [7.5, 4, 4]),
-    box("foot_right", FUR_DARK, [8.5, 0, -4], [12.5, 4, 4]),
+    # --- Legs, digitigrade: thigh forward, shin back, foot flat ------
+    #
+    # A wolf stands on its toes. What looks like a backwards knee is an
+    # ankle, and the foot is the long bone between it and the ground.
+    box("haunch_left", FUR, [3, 14, 2.5], [7.5, 21, 8.5], ("x", 22.5, [5.5, 20, 5.5])),
+    box("haunch_right", FUR, [8.5, 14, 2.5], [13, 21, 8.5], ("x", 22.5, [10.5, 20, 5.5])),
+    box("thigh_left", FUR_MID, [3.5, 11, 3], [7.5, 18, 8], ("x", 22.5, [5.5, 20, 5.5])),
+    box("thigh_right", FUR_MID, [8.5, 11, 3], [12.5, 18, 8], ("x", 22.5, [10.5, 20, 5.5])),
+    # A tuft at the back of each haunch, where a wolf's trousers are.
+    box("haunch_tuft_left", FUR_DARK, [3.5, 15, 8], [7, 20, 10], ("x", 45, [5.5, 20, 8])),
+    box("haunch_tuft_right", FUR_DARK, [9, 15, 8], [12.5, 20, 10], ("x", 45, [10.5, 20, 8])),
+    box("shin_left", FUR_MID, [4, 4, 0], [7, 12, 4], ("x", -22.5, [5.5, 12, 2])),
+    box("shin_right", FUR_MID, [9, 4, 0], [12, 12, 4], ("x", -22.5, [10.5, 12, 2])),
+    # The hock, which is the joint that makes the Z legible.
+    box("hock_left", FUR_DARK, [4.25, 10, 3.5], [6.75, 13, 5.5], ("x", -22.5, [5.5, 12, 2])),
+    box("hock_right", FUR_DARK, [9.25, 10, 3.5], [11.75, 13, 5.5], ("x", -22.5, [10.5, 12, 2])),
+    # Feet, split into three toes with a claw on each, because one box
+    # with a pale cap on it is a boot.
+    box("foot_left", FUR_DARK, [3.5, 0.75, -1.5], [7.5, 4, 4]),
+    box("foot_right", FUR_DARK, [8.5, 0.75, -1.5], [12.5, 4, 4]),
+    box("toe_left_0", FUR_MID, [3.6, 0, -4], [4.7, 2, -1], ("x", -22.5, [4.15, 2, -1])),
+    box("toeclaw_left_0", CLAW, [3.75, 0, -5.5], [4.55, 1.4, -3.8], ("x", -22.5, [4.15, 2, -1])),
+    box("toe_left_1", FUR_MID, [4.9, 0, -4], [6.0, 2, -1], ("x", -22.5, [5.45, 2, -1])),
+    box("toeclaw_left_1", CLAW, [5.05, 0, -5.5], [5.85, 1.4, -3.8], ("x", -22.5, [5.45, 2, -1])),
+    box("toe_left_2", FUR_MID, [6.2, 0, -4], [7.3, 2, -1], ("x", -22.5, [6.75, 2, -1])),
+    box("toeclaw_left_2", CLAW, [6.35, 0, -5.5], [7.15, 1.4, -3.8], ("x", -22.5, [6.75, 2, -1])),
+    box("toe_right_0", FUR_MID, [8.6, 0, -4], [9.7, 2, -1], ("x", -22.5, [9.15, 2, -1])),
+    box("toeclaw_right_0", CLAW, [8.75, 0, -5.5], [9.55, 1.4, -3.8], ("x", -22.5, [9.15, 2, -1])),
+    box("toe_right_1", FUR_MID, [9.9, 0, -4], [11.0, 2, -1], ("x", -22.5, [10.45, 2, -1])),
+    box("toeclaw_right_1", CLAW, [10.05, 0, -5.5], [10.85, 1.4, -3.8], ("x", -22.5, [10.45, 2, -1])),
+    box("toe_right_2", FUR_MID, [11.2, 0, -4], [12.3, 2, -1], ("x", -22.5, [11.75, 2, -1])),
+    box("toeclaw_right_2", CLAW, [11.35, 0, -5.5], [12.15, 1.4, -3.8], ("x", -22.5, [11.75, 2, -1])),
 
-    # Hips, and a deep chest that narrows to them, leaning forward.
+    # --- Body: hips, a ribcage that tapers, a chest over its feet ----
     box("pelvis", FUR, [4, 16, 2.5], [12, 21, 8]),
     box("chest", FUR, [3, 20, 1], [13, 30, 8], ("x", -22.5, [8, 20, 6])),
-    box("belly", BELLY, [4.5, 17, 2], [11.5, 22, 7]),
-    # The ruff: a heavy collar where the neck meets the shoulders,
-    # which is most of why a drawn werewolf reads as a wolf wearing a
-    # man rather than a man wearing a wolf's head. Wider than the chest
-    # on every side so it is a collar and not a stripe, and never flush
-    # with it - two faces in one plane fight for the same pixels and
-    # flicker as the camera moves.
-    box("ruff", PELT, [2.5, 25, 0.5], [13.5, 30.5, 8.5], ("x", -22.5, [8, 20, 6])),
+    # The ribcage narrows where a chest meets a waist. Two boxes do
+    # what one cannot: a taper.
+    box("ribs", FUR_MID, [3.5, 20, 1.5], [12.5, 25, 7.5], ("x", -22.5, [8, 20, 6])),
+    box("waist", FUR_MID, [4.5, 17.5, 2.5], [11.5, 21, 7]),
+    box("belly", BELLY, [5, 17, 1.5], [11, 22, 6.5]),
+    box("belly_shade", PELT_DARK, [5.25, 16.5, 2], [10.75, 18.5, 6]),
+    # Pectorals, which is where the light fur starts on the reference.
+    box("pec_left", PELT, [4.5, 23, 0.4], [7.6, 28, 2.4], ("x", -22.5, [8, 20, 6])),
+    box("pec_right", PELT, [8.4, 23, 0.4], [11.5, 28, 2.4], ("x", -22.5, [8, 20, 6])),
 
-    # Head, carried forward of the shoulders and tipped down, which is
-    # where a wolf carries one and is the opposite of where a player
-    # model does.
+    # --- The ruff, in tufts rather than as a collar ------------------
+    #
+    # A single slab around the neck is a scarf. Five pieces at
+    # different heights, each standing proud of the chest, is fur.
+    box("ruff", PELT, [3, 25, 1], [13, 30, 8.5], ("x", -22.5, [8, 20, 6])),
+    box("ruff_shade", PELT_DARK, [3.2, 25, 1.2], [12.8, 26.8, 8.3], ("x", -22.5, [8, 20, 6])),
+    box("ruff_tuft_0", PELT, [2.2, 25.5, 2.5], [4.6, 30.5, 7.5], ("x", -22.5, [8, 20, 6])),
+    box("ruff_tuft_1", PELT, [11.4, 25.5, 2.5], [13.8, 30.5, 7.5], ("x", -22.5, [8, 20, 6])),
+    box("ruff_tuft_2", PELT, [4.2, 29.5, 5.0], [7.0, 32.0, 8.8], ("x", -22.5, [8, 20, 6])),
+    box("ruff_tuft_3", PELT, [9.0, 29.5, 5.0], [11.8, 32.0, 8.8], ("x", -22.5, [8, 20, 6])),
+    box("ruff_tuft_4", PELT, [6.6, 30.0, 2.0], [9.4, 32.0, 6.0], ("x", -22.5, [8, 20, 6])),
+    # Hackles: the raised ridge down the spine of an animal that has
+    # already decided about you. Uneven on purpose - a row of matched
+    # spikes is a stegosaurus.
+    box("hackle_0", FUR_DARK, [7, 29.5, 3.0], [9, 31.5, 4.2], ("x", -22.5, [8, 20, 6])),
+    box("hackle_1", FUR_DARK, [7, 29.5, 4.6], [9, 32.0, 5.8], ("x", -22.5, [8, 20, 6])),
+    box("hackle_2", FUR_DARK, [7, 29.0, 6.2], [9, 31.0, 7.4], ("x", -22.5, [8, 20, 6])),
+
+    # --- Head: brows, a tapering muzzle, and an open mouth -----------
+    box("neck", FUR_MID, [5.5, 26, -1], [10.5, 30, 3], ("x", -22.5, [8, 20, 6])),
     box("head", FUR, [4.5, 24, -6], [11.5, 30.5, 1], ("x", -22.5, [8, 27, -2])),
-    # A muzzle in two pieces, because a tapering snout is the one shape
-    # a single box cannot make.
-    box("muzzle", MUZZLE, [5.5, 24.5, -10], [10.5, 28.5, -5], ("x", -22.5, [8, 27, -2])),
-    box("muzzle_tip", MUZZLE, [6.25, 24.75, -12.5], [9.75, 27.5, -9.5], ("x", -22.5, [8, 27, -2])),
-    box("nose", FUR_DARK, [6.75, 25.75, -13.5], [9.25, 27.5, -12], ("x", -22.5, [8, 27, -2])),
-    # Ears back and low rather than up and alert: an animal that has
-    # already decided about you.
-    box("ear_left", FUR_DARK, [4.75, 30, 0], [7, 32, 2.5], ("x", -22.5, [8, 27, -2])),
-    box("ear_right", FUR_DARK, [9, 30, 0], [11.25, 32, 2.5], ("x", -22.5, [8, 27, -2])),
-    box("eye_left", EYE, [5.75, 27.5, -6.4], [7.25, 29, -5.9], ("x", -22.5, [8, 27, -2])),
-    box("eye_right", EYE, [8.75, 27.5, -6.4], [10.25, 29, -5.9], ("x", -22.5, [8, 27, -2])),
+    # A brow ridge over each eye, which is what makes a wolf look like
+    # it means it. The eyes sit under them rather than on a flat face.
+    box("brow_left", FUR_DARK, [4.7, 29.3, -6.6], [6.6, 30.4, -3.5], ("x", -22.5, [8, 27, -2])),
+    box("brow_right", FUR_DARK, [9.4, 29.3, -6.6], [11.3, 30.4, -3.5], ("x", -22.5, [8, 27, -2])),
+    box("eye_left", EYE, [4.9, 27.8, -6.9], [6.3, 29.3, -6.1], ("x", -22.5, [8, 27, -2])),
+    box("eye_right", EYE, [9.7, 27.8, -6.9], [11.1, 29.3, -6.1], ("x", -22.5, [8, 27, -2])),
+    box("cheek_left", PELT, [4.6, 25, -6.4], [5.6, 28, -3.5], ("x", -22.5, [8, 27, -2])),
+    box("cheek_right", PELT, [10.4, 25, -6.4], [11.4, 28, -3.5], ("x", -22.5, [8, 27, -2])),
+    # The upper jaw in two pieces, because a tapering snout is the one
+    # shape a single box cannot make.
+    box("muzzle", FUR_MID, [6.4, 25.5, -10], [9.6, 28.4, -5], ("x", -22.5, [8, 27, -2])),
+    box("muzzle_tip", FUR_MID, [6.9, 25.8, -12.5], [9.1, 27.6, -9.5], ("x", -22.5, [8, 27, -2])),
+    box("nose", FUR_DARK, [7.1, 26.5, -13.4], [8.9, 27.8, -12], ("x", -22.5, [8, 27, -2])),
+    # The mouth. A dark hole in a dark head is a hole; a red one with
+    # teeth in front of it is a snarl.
+    box("maw", MAW, [6.7, 24.6, -11.5], [9.3, 25.8, -5.5], ("x", -22.5, [8, 27, -2])),
+    # Upper teeth hang from the muzzle; lower teeth ride the jaw, which
+    # is the head's own tilt and twenty-two degrees more of it - one
+    # element takes one rotation, so an open mouth is a steeper angle
+    # about the same pivot rather than a second joint.
+    box("tooth_upper_0", CLAW, [6.85, 24.5, -11.6], [6.95, 25.9, -11.0], ("x", -22.5, [8, 27, -2])),
+    box("tooth_upper_1", CLAW, [7.47, 24.5, -11.5], [7.8, 25.9, -10.9], ("x", -22.5, [8, 27, -2])),
+    box("tooth_upper_2", CLAW, [8.09, 24.5, -11.4], [8.65, 25.9, -10.8], ("x", -22.5, [8, 27, -2])),
+    box("tooth_upper_3", CLAW, [8.71, 24.5, -11.3], [9.5, 25.9, -10.7], ("x", -22.5, [8, 27, -2])),
+    box("fang_upper_left", CLAW, [6.75, 23.6, -11.2], [7.0, 25.9, -10.4], ("x", -22.5, [8, 27, -2])),
+    box("fang_upper_right", CLAW, [8.7, 23.6, -11.2], [9.7, 25.9, -10.4], ("x", -22.5, [8, 27, -2])),
+    box("jaw", FUR_MID, [6.7, 23.2, -11.5], [9.3, 25.4, -5], ("x", -45, [8, 27, -2])),
+    box("chin", PELT_DARK, [6.9, 23.4, -11.2], [9.1, 24.4, -8], ("x", -45, [8, 27, -2])),
+    box("tooth_lower_0", CLAW, [6.9, 25.2, -11.2], [7.0, 26.4, -10.6], ("x", -45, [8, 27, -2])),
+    box("tooth_lower_1", CLAW, [7.5, 25.2, -11.1], [7.8, 26.4, -10.5], ("x", -45, [8, 27, -2])),
+    box("tooth_lower_2", CLAW, [8.1, 25.2, -11.0], [8.6, 26.4, -10.4], ("x", -45, [8, 27, -2])),
+    box("tooth_lower_3", CLAW, [8.7, 25.2, -10.9], [9.4, 26.4, -10.3], ("x", -45, [8, 27, -2])),
+    # Ears back and low: an animal mid-decision, not a dog being told.
+    box("ear_left", FUR_DARK, [4.75, 30, 0], [7.0, 32, 2.5], ("x", -22.5, [8, 27, -2])),
+    box("ear_right", FUR_DARK, [9.0, 30, 0], [11.25, 32, 2.5], ("x", -22.5, [8, 27, -2])),
+    box("ear_inner_left", FUR_MID, [5.1, 30.1, -0.4], [6.65, 31.4, 0.2], ("x", -22.5, [8, 27, -2])),
+    box("ear_inner_right", FUR_MID, [9.35, 30.1, -0.4], [10.9, 31.4, 0.2], ("x", -22.5, [8, 27, -2])),
 
-    # Arms in two bones, reaching forward and down. Long enough that the
-    # hands hang below the knee, which is the proportion that says this
-    # would rather be on four legs.
-    box("arm_left", FUR, [0.5, 19, 2.5], [4, 28, 7.5], ("x", 22.5, [2.25, 28, 5])),
-    box("arm_right", FUR, [12, 19, 2.5], [15.5, 28, 7.5], ("x", 22.5, [13.75, 28, 5])),
+    # --- Arms: two bones, a shoulder on top, claws on the end --------
+    box("deltoid_left", FUR, [0.8, 24, 2], [4.6, 29, 8], ("x", -22.5, [8, 20, 6])),
+    box("deltoid_right", FUR, [11.4, 24, 2], [15.2, 29, 8], ("x", -22.5, [8, 20, 6])),
+    box("arm_left", FUR_MID, [0.5, 19, 2.5], [4, 28, 7.5], ("x", 22.5, [2.25, 28, 5])),
+    box("arm_right", FUR_MID, [12, 19, 2.5], [15.5, 28, 7.5], ("x", 22.5, [13.75, 28, 5])),
+    # Elbow tufts, pointing back the way the arm came.
+    box("elbow_left", FUR_DARK, [0.4, 19, 6.5], [3.6, 22.5, 9], ("x", 45, [2, 20, 6])),
+    box("elbow_right", FUR_DARK, [12.4, 19, 6.5], [15.6, 22.5, 9], ("x", 45, [14, 20, 6])),
     box("forearm_left", FUR, [0, 11, 0.5], [3.5, 20, 5.5], ("x", -22.5, [1.75, 20, 3])),
     box("forearm_right", FUR, [12.5, 11, 0.5], [16, 20, 5.5], ("x", -22.5, [14.25, 20, 3])),
     box("hand_left", FUR_DARK, [0, 8, 0], [3.5, 11.5, 5]),
     box("hand_right", FUR_DARK, [12.5, 8, 0], [16, 11.5, 5]),
-    # Three claws a hand, raked forward. One pale block on the end of an
-    # arm reads as a glove; three that hang below it and point the way
-    # the animal is going read as the second thing you look at after the
-    # eyes, which is where the reference puts them.
-    box("claw_left_0", CLAW, [0.1, 4.5, -1], [1.05, 9, 2.5], ("x", 22.5, [0.57, 9, 1])),
-    box("claw_left_1", CLAW, [1.3, 4.5, -1], [2.25, 9, 2.5], ("x", 22.5, [1.77, 9, 1])),
-    box("claw_left_2", CLAW, [2.5, 4.5, -1], [3.45, 9, 2.5], ("x", 22.5, [2.97, 9, 1])),
-    box("claw_right_0", CLAW, [12.6, 4.5, -1], [13.55, 9, 2.5], ("x", 22.5, [13.07, 9, 1])),
-    box("claw_right_1", CLAW, [13.8, 4.5, -1], [14.75, 9, 2.5], ("x", 22.5, [14.27, 9, 1])),
-    box("claw_right_2", CLAW, [15.0, 4.5, -1], [15.95, 9, 2.5], ("x", 22.5, [15.47, 9, 1])),
+    # Three claws a hand, raked forward and each with a dark knuckle
+    # behind it so they read as fingers rather than as a comb.
+    box("knuckle_left_0", FUR_MID, [0.1, 7.5, -0.5], [1.1, 9.5, 1.5]),
+    box("claw_left_0", CLAW, [0.1, 4.5, -1.5], [1.05, 9, 2.5], ("x", 22.5, [0.57, 9, 1])),
+    box("knuckle_left_1", FUR_MID, [1.3, 7.5, -0.5], [2.3, 9.5, 1.5]),
+    box("claw_left_1", CLAW, [1.3, 4.5, -1.5], [2.25, 9, 2.5], ("x", 22.5, [1.77, 9, 1])),
+    box("knuckle_left_2", FUR_MID, [2.5, 7.5, -0.5], [3.5, 9.5, 1.5]),
+    box("claw_left_2", CLAW, [2.5, 4.5, -1.5], [3.45, 9, 2.5], ("x", 22.5, [2.97, 9, 1])),
+    box("knuckle_right_0", FUR_MID, [12.6, 7.5, -0.5], [13.6, 9.5, 1.5]),
+    box("claw_right_0", CLAW, [12.6, 4.5, -1.5], [13.55, 9, 2.5], ("x", 22.5, [13.07, 9, 1])),
+    box("knuckle_right_1", FUR_MID, [13.8, 7.5, -0.5], [14.8, 9.5, 1.5]),
+    box("claw_right_1", CLAW, [13.8, 4.5, -1.5], [14.75, 9, 2.5], ("x", 22.5, [14.27, 9, 1])),
+    box("knuckle_right_2", FUR_MID, [15.0, 7.5, -0.5], [16.0, 9.5, 1.5]),
+    box("claw_right_2", CLAW, [15.0, 4.5, -1.5], [15.95, 9, 2.5], ("x", 22.5, [15.47, 9, 1])),
 
-    # A tail in two falling segments. One box reads as a plank; the bend
-    # is what makes it hang.
-    box("tail", FUR_DARK, [6.5, 14, 7], [9.5, 19, 12], ("x", 22.5, [8, 19, 8])),
-    box("tail_tip", FUR_DARK, [7, 10, 11], [9, 15, 15], ("x", 45, [8, 15, 11])),
+    # --- Tail: three falling segments, tufted ------------------------
+    box("tail", FUR_DARK, [6.3, 14, 7], [9.7, 19, 12], ("x", 22.5, [8, 19, 8])),
+    box("tail_mid", FUR_MID, [6.6, 11.5, 10.5], [9.4, 16, 14.5], ("x", 45, [8, 15, 11])),
+    box("tail_tip", FUR_DARK, [6.9, 8.5, 13], [9.1, 12.5, 16.5], ("x", 45, [8, 12, 13])),
+    box("tail_tuft", PELT_LIT, [6.9, 8.6, 15.5], [9.1, 12, 16.8], ("x", 45, [8, 12, 13])),
 
-    # The light fur. Laid over the coat as thin slabs standing proud of
-    # it rather than cut into it, and each one carries the rotation of
-    # the part it sits on or it drifts off as the body leans.
+    # --- The light fur, laid proud of the coat -----------------------
     #
-    # <i>These were white streaks.</i> The reference has no white on it
-    # anywhere but the claws and the teeth; what looks like markings is
-    # the same steel grey as the belly catching the light, so that is
-    # what they are now. Asymmetry would read as damage, so they match.
-    box("blaze", PELT_LIT, [6.5, 21, 0.4], [9.5, 29, 1.1], ("x", -22.5, [8, 20, 6])),
-    box("muzzle_stripe", PELT_LIT, [7, 28.5, -12], [9, 29.1, -5], ("x", -22.5, [8, 27, -2])),
-    box("shoulder_left", PELT_LIT, [0.3, 22, 3.5], [0.9, 27, 7], ("x", 22.5, [2.25, 28, 5])),
-    box("shoulder_right", PELT_LIT, [15.1, 22, 3.5], [15.7, 27, 7], ("x", 22.5, [13.75, 28, 5])),
+    # Each piece carries the rotation of the part it sits on, or it
+    # drifts off as the body leans. The reference has no white on it
+    # anywhere but the claws and the teeth, so what looks like markings
+    # is this same grey catching the light.
+    box("blaze", PELT_LIT, [6.6, 20, 0.3], [9.4, 26, 1.2], ("x", -22.5, [8, 20, 6])),
+    box("muzzle_stripe", PELT_LIT, [7, 28.3, -12.2], [9, 29.0, -5.5], ("x", -22.5, [8, 27, -2])),
+    box("shoulder_left", PELT_LIT, [0.5, 24.5, 3.5], [1.1, 28.5, 7.5], ("x", -22.5, [8, 20, 6])),
+    box("shoulder_right", PELT_LIT, [14.9, 24.5, 3.5], [15.5, 28.5, 7.5], ("x", -22.5, [8, 20, 6])),
     box("pale_left", PELT_LIT, [-0.2, 12, 1.5], [0.4, 18, 5], ("x", -22.5, [1.75, 20, 3])),
     box("pale_right", PELT_LIT, [15.6, 12, 1.5], [16.2, 18, 5], ("x", -22.5, [14.25, 20, 3])),
-    box("tail_pale", PELT_LIT, [7, 10, 14.4], [9, 14, 15.1], ("x", 45, [8, 15, 11])),
 
     # The golden axe, in the right fist. See sprite() for why this is a
     # panel wearing the real item texture rather than boxes.
-    #
-    # Moved out with the hand: the fist is lower and further forward
-    # than it was, and an axe left at the old shoulder height would be
-    # held by nothing.
     sprite("axe", "minecraft:item/golden_axe",
-           [16.1, 1, -9], [16.9, 17, 7]),
+           [16.3, 1, -9], [17.1, 17, 7]),
 ]
 
 CREATURES = {"werewolf": WEREWOLF}
