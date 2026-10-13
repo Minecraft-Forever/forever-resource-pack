@@ -117,21 +117,43 @@ def sprite(name, texture, frm, to):
 # darken it is how you end up with a creature that only exists at noon.
 FUR = (52, 52, 62)
 FUR_DARK = (33, 33, 41)
+# The coat reads black by comparison, not by being black.
+#
+# <b>Reversed: the pelt was a dark blue-grey and the markings were white
+# fur.</b> The reference art it is drawn from is two tones and nothing
+# else - a near-black coat and a cool steel grey across the muzzle,
+# chest, shoulders and forearms - and the way to get that out of a
+# renderer that multiplies every face is to widen the gap rather than
+# to chase the black. The coat stays exactly where it was, because the
+# note above is the scar of a version that went darker and vanished
+# after dusk; the light tone comes up instead, and against #677276 a
+# (52, 52, 62) coat reads as black at any distance.
+#
+# Straight off the reference, which is one flat grey wherever the light
+# falls.
+PELT = (103, 114, 118)
+# Half a step brighter, for the panels that stand proud of the coat, so
+# a lit shoulder is a lit shoulder and not a patch of belly that has
+# wandered. Still nowhere near white - see the note the streaks left
+# behind: at full value a marking is the brightest thing in a night
+# arena and pulls the eye off the silhouette.
+PELT_LIT = (126, 137, 142)
 # Lighter than the coat, not darker. An underbelly in the darker fur
 # reads as a hole in the chest from the front, which is what the first
 # render showed - and the problem is worse the darker the coat gets.
-BELLY = (90, 90, 104)
-MUZZLE = (68, 68, 80)
-# Amber rather than red. Against brown fur red was the only thing that
-# carried; against black it is muddy, and amber is both brighter and
-# more lupine.
-EYE = (255, 176, 32)
-CLAW = (226, 222, 212)
-# Streaks. Not pure white: against a near-black coat, white at full
-# value is the brightest thing in a night arena and pulls the eye off
-# the silhouette onto the stripes. A bone grey reads as white fur and
-# stays part of the animal.
-STREAK = (198, 196, 190)
+BELLY = PELT
+MUZZLE = PELT
+# Red, and it was amber. <i>Reversed, and the reason amber won is still
+# true, which is why this is not the reference's crimson.</i> Red at the
+# value a painting uses is the darkest thing on a near-black animal and
+# turns to mud; the fix is to keep the hue and take the value up until
+# it carries. This is about as dark as a red can be and still read as
+# two lit eyes across an arena at night.
+EYE = (240, 48, 48)
+# Claws and teeth, which the reference draws in stark white and which
+# are small enough to afford it - the rule about white pulling the eye
+# was about markings covering half an animal.
+CLAW = (236, 234, 228)
 
 WEREWOLF = [
     # Torso: tilted forward by being deeper than it is wide.
@@ -151,8 +173,12 @@ WEREWOLF = [
     # Arms, long enough to reach past the knee.
     box("arm_left", FUR, [0.5, 12, 3], [4, 25, 8]),
     box("arm_right", FUR, [12, 12, 3], [15.5, 25, 8]),
-    box("claw_left", CLAW, [0.5, 10, 3.5], [4, 12, 7.5]),
-    box("claw_right", CLAW, [12, 10, 3.5], [15.5, 12, 7.5]),
+    # Claws, and the reference makes them the second thing you look at
+    # after the eyes: long enough to be a silhouette of their own rather
+    # than a pale cap on the end of an arm. They hang a block and a half
+    # below the fist and reach forward of it.
+    box("claw_left", CLAW, [0.5, 8.5, 3], [4, 12, 7.5]),
+    box("claw_right", CLAW, [12, 8.5, 3], [15.5, 12, 7.5]),
     # Legs, short and set back, digitigrade-ish.
     box("thigh_left", FUR, [4, 4, 4], [7.5, 14, 9]),
     box("thigh_right", FUR, [8.5, 4, 4], [12, 14, 9]),
@@ -163,20 +189,39 @@ WEREWOLF = [
     # second limb.
     box("tail", FUR_DARK, [6.5, 8, 8.5], [9.5, 14, 14]),
 
-    # White streaks. Laid *over* the coat as thin slabs standing a
-    # sixteenth proud of it, rather than cut into it - a box flush with
-    # the surface it sits on makes the two faces fight for the same
-    # pixels and flicker as the camera moves, which is a worse artefact
-    # than any amount of plainness.
+    # The ruff. The one piece of shape the reference has that this did
+    # not: a heavy collar of fur where the neck meets the shoulders,
+    # which is most of why a drawn werewolf reads as a wolf wearing a
+    # man rather than as a man wearing a wolf's head.
+    #
+    # Wider than the chest on every side so it is a collar rather than a
+    # stripe, and deliberately not flush with it - the chest's own faces
+    # sit at x 4 and 12 and z 2 and 9, and a face in the same plane as
+    # another fights it for pixels and flickers as the camera moves.
+    box("ruff", PELT, [3.5, 21.5, 2.5], [12.5, 25.5, 9.5]),
+
+    # The light fur, laid *over* the coat as thin slabs standing a
+    # sixteenth proud of it, rather than cut into it - same reason as
+    # the ruff.
     #
     # Placed where a real animal's markings are rather than scattered:
-    # a chest blaze, a stripe down the muzzle, a flash on each shoulder,
-    # and a tipped tail. Asymmetry would read as damage, so they match.
-    box("blaze", STREAK, [7, 15, 1.9], [9, 22, 2.4]),
-    box("muzzle_stripe", STREAK, [7.25, 27, -6], [8.75, 27.5, -1]),
-    box("shoulder_left", STREAK, [0.4, 20, 4], [1, 24, 7]),
-    box("shoulder_right", STREAK, [15, 20, 4], [15.6, 24, 7]),
-    box("tail_tip", STREAK, [6.5, 8, 13.4], [9.5, 12, 14.1]),
+    # down the chest, along the muzzle, a flash on each shoulder, and a
+    # tipped tail. Asymmetry would read as damage, so they match.
+    #
+    # <i>These were white streaks.</i> The reference has no white on it
+    # anywhere but the claws and the teeth; what looks like markings is
+    # the same steel grey as the belly catching the light, so that is
+    # what they are now.
+    box("blaze", PELT_LIT, [7, 15, 1.9], [9, 22, 2.4]),
+    box("muzzle_stripe", PELT_LIT, [7.25, 27, -6], [8.75, 27.5, -1]),
+    box("shoulder_left", PELT_LIT, [0.4, 20, 4], [1, 24, 7]),
+    box("shoulder_right", PELT_LIT, [15, 20, 4], [15.6, 24, 7]),
+    # And the forearms, which is where the reference puts its second
+    # band of grey - a wholly dark arm with a pale fist on the end of it
+    # reads as a glove rather than as a limb.
+    box("forearm_left", PELT_LIT, [0.4, 13, 4], [1, 18, 7]),
+    box("forearm_right", PELT_LIT, [15, 13, 4], [15.6, 18, 7]),
+    box("tail_tip", PELT_LIT, [6.5, 8, 13.4], [9.5, 12, 14.1]),
 
     # The golden axe, in the right fist.
     #
