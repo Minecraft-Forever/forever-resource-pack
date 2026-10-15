@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "forever:item/rune_timber_4_uncut"
+  }
+}
