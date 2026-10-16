@@ -39,14 +39,19 @@ CLEAR = (0, 0, 0, 0)
 # Near-white rather than gold. The label beside it is gold and a gold
 # arrow beside a gold word reads as one blob at inventory scale; this is
 # a mark on a dark background, so the brightest thing wins.
-BODY = (232, 232, 232, 255)
-SHADE = (176, 176, 176, 255)
-EDGE = (42, 42, 42, 255)
+BODY = (226, 226, 226, 255)
+SHADE = (168, 168, 168, 255)
 
 # The shaft, then the head. Both inclusive, both in texture pixels.
+#
+# <b>Smaller than it was, and the head now starts where the shaft
+# stops.</b> The old numbers ran the head from x=8, overlapping the
+# shaft's last column, and with the outline below the whole mark was
+# fifteen pixels across - which in a twelve-pixel slot is a block with
+# an arrow cut out of it rather than an arrow.
 SHAFT_X = (2, 8)
 SHAFT_Y = (6, 9)
-HEAD_X = (8, 13)
+HEAD_X = (9, 13)
 HEAD_HALF = 5
 
 
@@ -56,32 +61,47 @@ def solid():
     for x in range(SHAFT_X[0], SHAFT_X[1] + 1):
         for y in range(SHAFT_Y[0], SHAFT_Y[1] + 1):
             filled.add((x, y))
-    span = HEAD_X[1] - HEAD_X[0]
-    for step, x in enumerate(range(HEAD_X[0], HEAD_X[1] + 1)):
-        # Linear taper to a point, and the +1 keeps the tip two pixels
-        # tall: a one-pixel tip disappears at the scale this is drawn.
-        half = max(1, round(HEAD_HALF * (1 - step / span)))
-        for y in range(8 - half, 8 + half):
+    # One row off each side per column, which is the 2:1 slope every
+    # arrowhead in the game's own interface uses.
+    #
+    # <b>This was a proportional taper and it drew a lumpy head.</b> It
+    # was round(HEAD_HALF * (1 - step / span)), which for the middle
+    # column is round(2.5) - and Python rounds halves to even, so that
+    # is 2 rather than 3. The head jumped from four rows to two, then
+    # drew its last two columns identically, which is the notch under
+    # the tip. A taper that counts down cannot round at all.
+    half = HEAD_HALF
+    for x in range(HEAD_X[0], HEAD_X[1] + 1):
+        # The tip stays two pixels tall: a one-pixel tip disappears at
+        # the scale this is drawn.
+        for y in range(8 - max(1, half), 8 + max(1, half)):
             filled.add((x, y))
+        half -= 1
     return filled
 
 
 def draw():
+    """
+    Two tones and no outline.
+
+    <b>The black keyline is gone.</b> It was the single thing making
+    this read as a sticker laid on the window rather than part of it,
+    and it is the same mistake the first rune sprites made - almost
+    nothing in Minecraft is outlined in black; things are outlined in a
+    dark tone of their own material, if at all. A near-white mark on a
+    dark slot needs no help standing out, so the outline was buying
+    contrast that was already there and paying for it in weight.
+
+    What is left is the shape and one row of shade along its underside,
+    which gives the light a direction and stops the arrow reading as a
+    hole cut in the window.
+    """
     filled = solid()
     pixels = [[CLEAR for _ in range(SIZE)] for _ in range(SIZE)]
     for (x, y) in filled:
         if 0 <= x < SIZE and 0 <= y < SIZE:
-            # One row of shade along the bottom, so the shape has a
-            # direction to the light and does not read as a cut-out.
             below = (x, y + 1) not in filled
             pixels[y][x] = SHADE if below else BODY
-    # An outline, drawn after: every empty pixel touching the shape.
-    for (x, y) in list(filled):
-        for (dx, dy) in ((1, 0), (-1, 0), (0, 1), (0, -1)):
-            nx, ny = x + dx, y + dy
-            if (nx, ny) in filled or not (0 <= nx < SIZE and 0 <= ny < SIZE):
-                continue
-            pixels[ny][nx] = EDGE
     return pixels
 
 
